@@ -24,17 +24,30 @@ def get_lat_lon():
 
     return jsonify(response.json())
 
+@proxy_bp.route("/location/reverse", methods=["GET"])
+def get_city():
+    lat_query = request.args.get("lat")
+    lon_query = request.args.get("lon")
+    if not lat_query or not lon_query:
+        return {"message": "must provide lat and lon parameters"}
+
+    response = requests.get(
+        "https://us1.locationiq.com/v1/reverse.php",
+        params={"lat": lat_query, "lon": lon_query, "format": "json", "key": location_key}
+    )
+    return jsonify(response.json())
+
 @proxy_bp.route("/weather", methods=["GET"])
 def get_weather():
     lat_query = request.args.get("lat")
     lon_query = request.args.get("lon")
-    print(lat_query, lon_query)
+    units_query = request.args.get("units");
     if not lat_query or not lon_query:
         return {"message": "must provide lat and lon parameters"}
 
     response = requests.get(
         "https://api.openweathermap.org/data/2.5/onecall",
-        params={"lat": lat_query, "lon": lon_query, "appid": weather_key}
+        params={"lat": lat_query, "lon": lon_query, "units": units_query, "appid": weather_key}
     )
     return response.json()
 
